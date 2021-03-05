@@ -28,3 +28,10 @@ The shell shall support the "kill" command where "kill [Process_ID]" terminates 
 
 ## Main.c 
 Main.c runs a while loop that accepts input from user commands and outputs the correct response.
+
+# Starting The Project
+```bash
+cd src
+make
+./main
+```
