@@ -1,3 +1,0 @@
-/Users/emin/Desktop/Spring'21/CS352/Project-1/LittleShell/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/emin/Desktop/Spring'21/CS352/Project-1/LittleShell/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/emin/Desktop/Spring'21/CS352/Project-1/LittleShell/cmake-build-debug/CMakeFiles/LittleShell.dir

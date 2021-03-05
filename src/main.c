@@ -73,12 +73,16 @@ int findSymbol(Cmd* cmd, char symbol) {
 /* Signal handler for SIGTSTP (SIGnal - Terminal SToP),
  * which is caused by the user pressing control+z. */
 void sigtstpHandler(int sig_num) {
+    int status = 0;
     /* Reset handler to catch next SIGTSTP. */
     signal(SIGTSTP, sigtstpHandler);
     if (foregroundPid > 0) {
         /* Foward SIGTSTP to the currently running foreground process. */
         kill(foregroundPid, SIGTSTP);
         /* TODO: Add foreground command to the list of jobs. */
+        waitpid(foregroundPid, &status, WNOHANG);
+    } else{
+        exit(0);
     }
 }
 

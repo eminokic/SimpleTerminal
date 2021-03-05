@@ -3,4 +3,4 @@ project(LittleShell C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_library(LittleShell main.c)
+add_library(LittleShell src/main.c)
