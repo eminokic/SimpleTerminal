@@ -10,6 +10,7 @@
 
 *******************************************************************************/
 
+#include "../include/Colors.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -41,6 +42,7 @@
 #define COMMAND_KILL 6
 #define COMMAND_EXPORT 7
 #define COMMAND_UNSET 8
+#define COMMAND_HELP 9
 
 #define STATUS_RUNNING 0
 #define STATUS_DONE 1
@@ -357,6 +359,8 @@ int get_command_type(char *command) {
         return COMMAND_EXPORT;
     } else if (strcmp(command, "unset") == 0) {
         return COMMAND_UNSET;
+    } else if(strcmp(command, "help") == 0) {
+        return COMMAND_HELP;
     } else {
         return COMMAND_EXTERNAL;
     }
@@ -376,19 +380,19 @@ char* helper_strtrim(char* line) {
     return head;
 }
 
-void mysh_update_cwd_info() {
+void command_update_cwd_info() {
     getcwd(shell->cur_dir, sizeof(shell->cur_dir));
 }
 
-int mysh_cd(int argc, char** argv) {
+int command_cd(int argc, char** argv) {
     if (argc == 1) {
         chdir(shell->pw_dir);
-        mysh_update_cwd_info();
+        command_update_cwd_info();
         return 0;
     }
 
     if (chdir(argv[1]) == 0) {
-        mysh_update_cwd_info();
+        command_update_cwd_info();
         return 0;
     } else {
         printf("352> cd %s: No such file or directory\n", argv[1]);
@@ -396,7 +400,7 @@ int mysh_cd(int argc, char** argv) {
     }
 }
 
-int mysh_jobs(int argc, char **argv) {
+int command_jobs(int argc, char **argv) {
     int i;
 
     for (i = 0; i < NR_JOBS; i++) {
@@ -408,7 +412,7 @@ int mysh_jobs(int argc, char **argv) {
     return 0;
 }
 
-int mysh_fg(int argc, char **argv) {
+int command_fg(int argc, char **argv) {
     if (argc < 2) {
         printf("usage: fg <pid>\n");
         return -1;
@@ -453,7 +457,7 @@ int mysh_fg(int argc, char **argv) {
     return 0;
 }
 
-int mysh_bg(int argc, char **argv) {
+int command_bg(int argc, char **argv) {
     if (argc < 2) {
         printf("usage: bg <pid>\n");
         return -1;
@@ -486,7 +490,7 @@ int mysh_bg(int argc, char **argv) {
     return 0;
 }
 
-int mysh_kill(int argc, char **argv) {
+int command_kill(int argc, char **argv) {
     if (argc < 2) {
         printf("usage: kill <pid>\n");
         return -1;
@@ -523,7 +527,7 @@ int mysh_kill(int argc, char **argv) {
     return 1;
 }
 
-int mysh_export(int argc, char **argv) {
+int command_export(int argc, char **argv) {
     if (argc < 2) {
         printf("usage: export KEY=VALUE\n");
         return -1;
@@ -532,7 +536,7 @@ int mysh_export(int argc, char **argv) {
     return putenv(argv[1]);
 }
 
-int mysh_unset(int argc, char **argv) {
+int command_unset(int argc, char **argv) {
     if (argc < 2) {
         printf("usage: unset KEY\n");
         return -1;
@@ -541,10 +545,51 @@ int mysh_unset(int argc, char **argv) {
     return unsetenv(argv[1]);
 }
 
-int mysh_exit() {
+int command_exit() {
     printf("Closing shell ... \n");
     exit(0);
 }
+
+/**
+  @brief List of builtin commands, followed by their corresponding functions.
+ */
+char *builtin_str[] = {
+        "cd - The cd command changes the current directory.",
+        "help - The help command prints out all available commands.",
+        "ls - The ls command prints out all files in the current directory.",
+        "bg - The bg command resumes a background process.",
+        "jobs - The jobs command prints out all currently running background and foreground commands.",
+        "kill - The kill command stops the selected process.",
+        "& - The ampersand operator can be used to execute processes in the background.",
+        "| - The mid operator can be used to pipeline commands.",
+        "exit - The exit command closes the shell interface."
+};
+
+/**
+ * @brief Printing all available commands.
+ * @return size of commands array.
+ */
+int num_builtins() {
+    return sizeof(builtin_str) / sizeof(char *);
+}
+/**
+   @brief Builtin command: print help.
+   @param args List of args.  Not examined.
+   @return Always returns 1, to continue executing.
+ */
+    int command_help(char **args)
+    {
+    int i;
+    printf("UNIX Shell Interface\n");
+    printf("The following are built in:\n");
+
+    for (i = 0; i < num_builtins(); i++) {
+    printf("  %s\n", builtin_str[i]);
+    }
+
+    printf("Use the man command for information on other programs.\n");
+    return 1;
+    }
 
 void check_zombie() {
     int status, pid;
@@ -574,28 +619,31 @@ int mysh_execute_builtin_command(struct process *proc) {
 
     switch (proc->type) {
         case COMMAND_EXIT:
-            mysh_exit();
+            command_exit();
             break;
         case COMMAND_CD:
-            mysh_cd(proc->argc, proc->argv);
+            command_cd(proc->argc, proc->argv);
             break;
         case COMMAND_JOBS:
-            mysh_jobs(proc->argc, proc->argv);
+            command_jobs(proc->argc, proc->argv);
             break;
         case COMMAND_FG:
-            mysh_fg(proc->argc, proc->argv);
+            command_fg(proc->argc, proc->argv);
             break;
         case COMMAND_BG:
-            mysh_bg(proc->argc, proc->argv);
+            command_bg(proc->argc, proc->argv);
             break;
         case COMMAND_KILL:
-            mysh_kill(proc->argc, proc->argv);
+            command_kill(proc->argc, proc->argv);
             break;
         case COMMAND_EXPORT:
-            mysh_export(proc->argc, proc->argv);
+            command_export(proc->argc, proc->argv);
             break;
         case COMMAND_UNSET:
-            mysh_unset(proc->argc, proc->argv);
+            command_unset(proc->argc, proc->argv);
+            break;
+        case COMMAND_HELP:
+            command_help(proc->argv);
             break;
         default:
             status = 0;
@@ -897,8 +945,8 @@ char* mysh_read_line() {
 }
 
 void mysh_print_promt() {
-    printf(COLOR_CYAN "%s" COLOR_NONE " in " COLOR_YELLOW "%s" COLOR_NONE "\n", shell->cur_user, shell->cur_dir);
-    printf(COLOR_RED "352>" COLOR_NONE " ");
+    printf("User: " COLOR_CYAN "%s" COLOR_NONE " \nDirectory: " COLOR_YELLOW "%s" COLOR_NONE "\n", shell->cur_user, shell->cur_dir);
+    printf(COLOR_WHITE "352>" COLOR_NONE " ");
 }
 
 void mysh_print_welcome() {
