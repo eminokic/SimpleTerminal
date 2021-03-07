@@ -7,8 +7,12 @@
   @date         Monday,  8 March 2021
 
   @description  ANSI color table used for reference in the main program.
+                Note, most color definitions were found online by an open source used to make the shell a little more user friendly.
 
 *******************************************************************************/
+
+//Default text
+#define COLOR_NONE "\033[m"
 
 //Regular text
 #define COLOR_BLACK_REGULAR "\e[0;30m"

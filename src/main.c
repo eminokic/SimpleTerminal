@@ -54,12 +54,6 @@
 #define PROC_FILTER_DONE 1
 #define PROC_FILTER_REMAINING 2
 
-#define COLOR_NONE "\033[m"
-#define COLOR_RED "\033[1;37;41m"
-#define COLOR_YELLOW "\033[1;33m"
-#define COLOR_CYAN "\033[0;36m"
-#define COLOR_GREEN "\033[0;32;32m"
-#define COLOR_GRAY "\033[1;30m"
 
 const char* STATUS_STRING[] = {
     "running",
@@ -546,7 +540,7 @@ int command_unset(int argc, char **argv) {
 }
 
 int command_exit() {
-    printf("Closing shell ... \n");
+    printf(BHWHT "Closing shell ... \n");
     exit(0);
 }
 
@@ -580,11 +574,11 @@ int num_builtins() {
     int command_help(char **args)
     {
     int i;
-    printf("UNIX Shell Interface\n");
-    printf("The following are built in:\n");
+    printf(BHWHT "UNIX Shell Interface\n");
+    printf(BHWHT "The following are built in:\n");
 
     for (i = 0; i < num_builtins(); i++) {
-    printf("  %s\n", builtin_str[i]);
+    printf(BHWHT "  %s\n", builtin_str[i]);
     }
 
     printf("Use the man command for information on other programs.\n");
@@ -945,12 +939,12 @@ char* read_line() {
 }
 
 void print_promt() {
-    printf("User: " COLOR_CYAN "%s" COLOR_NONE " \nDirectory: " COLOR_YELLOW "%s" COLOR_NONE "\n", shell->cur_user, shell->cur_dir);
-    printf(COLOR_WHITE "352>" COLOR_NONE " ");
+    printf(BHWHT "User: " HCYN "%s" BHWHT " \nDirectory: " HYEL "%s" COLOR_NONE "\n", shell->cur_user, shell->cur_dir);
+    printf(BHWHT "352>" BHWHT " ");
 }
 
 void print_welcome() {
-    printf("Loading UNIX Shell... \n");
+    printf(BHWHT "Loading UNIX Shell... \n");
 }
 
 void loop() {
