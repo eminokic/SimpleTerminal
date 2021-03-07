@@ -653,7 +653,7 @@ int mysh_execute_builtin_command(struct process *proc) {
     return status;
 }
 
-int mysh_launch_process(struct job *job, struct process *proc, int in_fd, int out_fd, int mode) {
+int command_launch_process(struct job *job, struct process *proc, int in_fd, int out_fd, int mode) {
     proc->status = STATUS_RUNNING;
     if (proc->type != COMMAND_EXTERNAL && mysh_execute_builtin_command(proc)) {
         return 0;
@@ -739,7 +739,7 @@ int mysh_launch_job(struct job *job) {
         }
         if (proc->next != NULL) {
             pipe(fd);
-            status = mysh_launch_process(job, proc, in_fd, fd[1], PIPELINE_EXECUTION);
+            status = command_launch_process(job, proc, in_fd, fd[1], PIPELINE_EXECUTION);
             close(fd[1]);
             in_fd = fd[0];
         } else {
@@ -750,7 +750,7 @@ int mysh_launch_job(struct job *job) {
                     out_fd = 1;
                 }
             }
-            status = mysh_launch_process(job, proc, in_fd, out_fd, job->mode);
+            status = command_launch_process(job, proc, in_fd, out_fd, job->mode);
         }
     }
 
@@ -765,7 +765,7 @@ int mysh_launch_job(struct job *job) {
     return status;
 }
 
-struct process* mysh_parse_command_segment(char *segment) {
+struct process* parse_command_segment(char *segment) {
     int bufsize = TOKEN_BUFSIZE;
     int position = 0;
     char *command = strdup(segment);
@@ -860,7 +860,7 @@ struct process* mysh_parse_command_segment(char *segment) {
     return new_proc;
 }
 
-struct job* mysh_parse_command(char *line) {
+struct job* parse_command(char *line) {
     line = helper_strtrim(line);
     char *command = strdup(line);
 
@@ -879,7 +879,7 @@ struct job* mysh_parse_command(char *line) {
             strncpy(seg, line_cursor, seg_len);
             seg[seg_len] = '\0';
 
-            struct process* new_proc = mysh_parse_command_segment(seg);
+            struct process* new_proc = parse_command_segment(seg);
             if (!root_proc) {
                 root_proc = new_proc;
                 proc = root_proc;
@@ -911,7 +911,7 @@ struct job* mysh_parse_command(char *line) {
     return new_job;
 }
 
-char* mysh_read_line() {
+char* read_line() {
     int bufsize = COMMAND_BUFSIZE;
     int position = 0;
     char *buffer = malloc(sizeof(char) * bufsize);
@@ -944,33 +944,33 @@ char* mysh_read_line() {
     }
 }
 
-void mysh_print_promt() {
+void print_promt() {
     printf("User: " COLOR_CYAN "%s" COLOR_NONE " \nDirectory: " COLOR_YELLOW "%s" COLOR_NONE "\n", shell->cur_user, shell->cur_dir);
     printf(COLOR_WHITE "352>" COLOR_NONE " ");
 }
 
-void mysh_print_welcome() {
+void print_welcome() {
     printf("Loading UNIX Shell... \n");
 }
 
-void mysh_loop() {
+void loop() {
     char *line;
     struct job *job;
     int status = 1;
 
     while (1) {
-        mysh_print_promt();
-        line = mysh_read_line();
+        print_promt();
+        line = read_line();
         if (strlen(line) == 0) {
             check_zombie();
             continue;
         }
-        job = mysh_parse_command(line);
+        job = parse_command(line);
         status = mysh_launch_job(job);
     }
 }
 
-void mysh_init() {
+void init() {
     struct sigaction sigint_action = {
         .sa_handler = &sigint_handler,
         .sa_flags = 0
@@ -997,13 +997,13 @@ void mysh_init() {
         shell->jobs[i] = NULL;
     }
 
-    mysh_update_cwd_info();
+    command_update_cwd_info();
 }
 
 int main(int argc, char **argv) {
-    mysh_init();
-    mysh_print_welcome();
-    mysh_loop();
+    init();
+    print_welcome();
+    loop();
 
     return EXIT_SUCCESS;
 }
