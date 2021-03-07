@@ -556,6 +556,8 @@ char *builtin_str[] = {
         "kill - The kill command stops the selected process.",
         "& - The ampersand operator can be used to execute processes in the background.",
         "| - The mid operator can be used to pipeline commands.",
+        "unset - The unset command removes some arbitrary variable from the shell. \n Note: You cannot unset readonly variables."
+        "export - The export command allows a variable to be passed down to child processes when specified without affecting other environments."
         "exit - The exit command closes the shell interface."
 };
 
@@ -608,7 +610,7 @@ void sigint_handler(int signal) {
     printf("\n");
 }
 
-int mysh_execute_builtin_command(struct process *proc) {
+int execute_builtin_command(struct process *proc) {
     int status = 1;
 
     switch (proc->type) {
@@ -649,7 +651,7 @@ int mysh_execute_builtin_command(struct process *proc) {
 
 int command_launch_process(struct job *job, struct process *proc, int in_fd, int out_fd, int mode) {
     proc->status = STATUS_RUNNING;
-    if (proc->type != COMMAND_EXTERNAL && mysh_execute_builtin_command(proc)) {
+    if (proc->type != COMMAND_EXTERNAL && execute_builtin_command(proc)) {
         return 0;
     }
 
@@ -713,7 +715,7 @@ int command_launch_process(struct job *job, struct process *proc, int in_fd, int
     return status;
 }
 
-int mysh_launch_job(struct job *job) {
+int launch_job(struct job *job) {
     struct process *proc;
     int status = 0, in_fd = 0, fd[2], job_id = -1;
 
@@ -938,7 +940,7 @@ char* read_line() {
     }
 }
 
-void print_promt() {
+void print_prompt() {
     printf(BHWHT "User: " HCYN "%s" BHWHT " \nDirectory: " HYEL "%s" COLOR_NONE "\n", shell->cur_user, shell->cur_dir);
     printf(BHWHT "352>" BHWHT " ");
 }
@@ -953,14 +955,14 @@ void loop() {
     int status = 1;
 
     while (1) {
-        print_promt();
+        print_prompt();
         line = read_line();
         if (strlen(line) == 0) {
             check_zombie();
             continue;
         }
         job = parse_command(line);
-        status = mysh_launch_job(job);
+        status = launch_job(job);
     }
 }
 
