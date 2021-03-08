@@ -43,6 +43,8 @@
 #define COMMAND_EXPORT 7
 #define COMMAND_UNSET 8
 #define COMMAND_HELP 9
+#define COMMAND_WHICH_USER 10
+#define COMMAND_WHICH_DIRECTORY 11
 
 #define STATUS_RUNNING 0
 #define STATUS_DONE 1
@@ -355,7 +357,11 @@ int get_command_type(char *command) {
         return COMMAND_UNSET;
     } else if(strcmp(command, "help") == 0) {
         return COMMAND_HELP;
-    } else {
+    } else if(strcmp(command, "who") == 0) {
+        return COMMAND_WHICH_USER;
+    } else if(strcmp(command, "where") == 0) {
+        return COMMAND_WHICH_DIRECTORY;
+    }  else {
         return COMMAND_EXTERNAL;
     }
 }
@@ -556,8 +562,10 @@ char *builtin_str[] = {
         "kill - The kill command stops the selected process.",
         "& - The ampersand operator can be used to execute processes in the background.",
         "| - The mid operator can be used to pipeline commands.",
-        "unset - The unset command removes some arbitrary variable from the shell. \n Note: You cannot unset readonly variables."
-        "export - The export command allows a variable to be passed down to child processes when specified without affecting other environments."
+        "unset - The unset command removes some arbitrary variable from the shell.",
+        "export - The export command allows a variable to be passed down to child processes when specified without affecting other environments.",
+        "who - The who command prints out the current user accessing the shell."
+        "where - The where command prints out the current directory the user is accessing."
         "exit - The exit command closes the shell interface."
 };
 
@@ -610,6 +618,16 @@ void sigint_handler(int signal) {
     printf("\n");
 }
 
+int command_print_user(char **args) {
+    printf(BHWHT "Current User: " HCYN "%s \n", shell->cur_user);
+    return 1;
+}
+
+int command_print_directory(char **args) {
+    printf(BHWHT "Directory: " HYEL "%s" COLOR_NONE "\n", shell->cur_dir);
+    return 1;
+}
+
 int execute_builtin_command(struct process *proc) {
     int status = 1;
 
@@ -640,6 +658,12 @@ int execute_builtin_command(struct process *proc) {
             break;
         case COMMAND_HELP:
             command_help(proc->argv);
+            break;
+        case COMMAND_WHICH_USER:
+            command_print_user(proc->argv);
+            break;
+        case COMMAND_WHICH_DIRECTORY:
+            command_print_directory(proc->argv);
             break;
         default:
             status = 0;
@@ -941,12 +965,12 @@ char* read_line() {
 }
 
 void print_prompt() {
-    printf(BHWHT "User: " HCYN "%s" BHWHT " \nDirectory: " HYEL "%s" COLOR_NONE "\n", shell->cur_user, shell->cur_dir);
     printf(BHWHT "352>" BHWHT " ");
 }
 
 void print_welcome() {
     printf(BHWHT "Loading UNIX Shell... \n");
+    printf(BHWHT "User: " HCYN "%s" BHWHT " \nDirectory: " HYEL "%s" COLOR_NONE "\n", shell->cur_user, shell->cur_dir);
 }
 
 void loop() {
