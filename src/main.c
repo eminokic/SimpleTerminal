@@ -58,11 +58,11 @@
 
 
 const char* STATUS_STRING[] = {
-    "running",
-    "done",
-    "suspended",
-    "continued",
-    "terminated"
+    "Running",
+    "Done",
+    "Suspended",
+    "Continued",
+    "Terminated"
 };
 
 struct process {
@@ -184,7 +184,7 @@ int print_job_status(int id) {
 
     struct process *proc;
     for (proc = shell->jobs[id]->root; proc != NULL; proc = proc->next) {
-        printf("\t%d\t%s\t%s", proc->pid,
+        printf("\t PID: %d \t STATUS: %s\t COMMAND: %s", proc->pid,
             STATUS_STRING[proc->status], proc->command);
         if (proc->next != NULL) {
             printf("|\n");
