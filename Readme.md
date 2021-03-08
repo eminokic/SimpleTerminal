@@ -1,6 +1,6 @@
 # CS 352 Project 1
 
-## Shell Interface
+## UNIX Shell Interface
 
 ## Description
 The objective is to implement a shell interface that accepts user commands and executes each 
@@ -29,6 +29,8 @@ The shell shall support the "kill" command where "kill [Process_ID]" terminates 
 ## Main.c 
 Main.c runs a while loop that accepts input from user commands and outputs the correct response.
 
+## Colors.h
+An open source file found alone used solely for the purposes of implementing UI designs of the shell.
 # Starting The Project
 ```bash
 cd src

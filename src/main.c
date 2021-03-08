@@ -4,7 +4,7 @@
 
   @author       Emin Okic
 
-  @date         Monday,  8 March 2021
+  @date         Monday, March 8th, 2021
 
   @Project        UNIX Shell
 
@@ -184,7 +184,7 @@ int print_job_status(int id) {
 
     struct process *proc;
     for (proc = shell->jobs[id]->root; proc != NULL; proc = proc->next) {
-        printf("\t PID: %d \t STATUS: %s\t COMMAND: %s", proc->pid,
+        printf("\t PID: %d \t STATUS: %s \t COMMAND: %s", proc->pid,
             STATUS_STRING[proc->status], proc->command);
         if (proc->next != NULL) {
             printf("|\n");
