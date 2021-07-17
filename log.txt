@@ -1,1 +1,2 @@
 This will serve as my temporary log while I learn linux and VIM. This is a shell interface I made for fun.
+For this log I am just practicing using terminal to setup and develop branches, pull requests etc. 
