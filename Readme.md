@@ -1,6 +1,4 @@
-# CS 352 Project 1
-
-## UNIX Shell Interface
+# UNIX Shell Interface
 
 ## Description
 The objective is to implement a shell interface that accepts user commands and executes each 
